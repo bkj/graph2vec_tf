@@ -54,8 +54,7 @@ class Skipgram(object):
             self.normalized_embeddings = graph_embeddings / tf.sqrt(tf.reduce_mean(tf.square(graph_embeddings), 1, keep_dims=True))
     
     def train(self, corpus, num_epochs, batch_size):
-        tf_config = tf.ConfigProto(log_device_placement=True, allow_soft_placement=False)
-        with tf.Session(graph=self.graph, config=tf_config) as sess:
+        with tf.Session(graph=self.graph, config=tf.ConfigProto(allow_soft_placement=False)) as sess:
             
             sess.run(tf.global_variables_initializer())
             

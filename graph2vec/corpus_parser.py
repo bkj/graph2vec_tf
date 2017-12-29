@@ -3,7 +3,7 @@ from collections import Counter
 from utils import get_files
 
 class Corpus(object):
-    def __init__(self, indir, graph_fname_list):
+    def __init__(self, graph_fname_list):
         self.subgraph_index = 0
         self.graph_index = 0
         self.epoch_flag = 0
@@ -12,16 +12,11 @@ class Corpus(object):
         # scan_and_load_corpus
         self.graph_fname_list = graph_fname_list
         self._graph_name_to_id_map = {g: i for i, g in enumerate(self.graph_fname_list)}  # input layer of the skipgram network
-        self._id_to_graph_name_map = {i: g for g, i in self._graph_name_to_id_map.iteritems()}
-        subgraph_to_id_map = self._scan_corpus()
-        self.graph_ids_for_batch_traversal = range(self.num_graphs)
-        np.random.shuffle(self.graph_ids_for_batch_traversal)
-    
-    def _scan_corpus(self):
         
+        # scan corpus
         subgraphs = []
         for fname in self.graph_fname_list:
-            subgraphs.extend([l.split()[0] for l in open(fname).xreadlines()])  # just take the first word of every sentence
+            subgraphs.extend([l.split()[0] for l in open(fname).readlines()])  # just take the first word of every sentence
         
         subgraphs.append('UNK')
         
@@ -41,9 +36,10 @@ class Corpus(object):
         self.subgraph_id_freq_map_as_list = [] #id of this list is the word id and value is the freq of word with corresponding word id
         for i in xrange(len(self._subgraph_to_freq_map)):
             self.subgraph_id_freq_map_as_list.append(self._subgraph_to_freq_map[self._id_to_subgraph_map[i]])
-            
-        return self._subgraph_to_id_map
         
+        self.graph_ids_for_batch_traversal = range(self.num_graphs)
+        np.random.shuffle(self.graph_ids_for_batch_traversal)
+    
     def generate_batch_from_file(self, batch_size):
         target_graph_ids = []
         context_subgraph_ids = []
