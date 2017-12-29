@@ -1,11 +1,5 @@
-#!/bin/bash
-
-# run.sh
-
-tar -xzvf data.tar.gz && rm data.tar.gz
-
-cd src
-python main.py --corpus ./data/kdd_datasets/mutag --class_labels_file_name ./data/kdd_datasets/mutag.Labels 
-
-python main.py --corpus ./data/kdd_datasets/proteins --class_labels_file_name ./data/kdd_datasets/proteins.Labels \
-    --batch_size 16 --embedding_size 128 --num_negsample 5
+python main.py -c ../data/kdd_datasets/mutag -l ../data/kdd_datasets/mutag.Labels -b 256 -d 512 --wlk_h 3 -e 1000 -lr 0.5
+python main.py -c ../data/kdd_datasets/ptc -l ../data/kdd_datasets/ptc.Labels -b 256 -d 512 --wlk_h 3 -e 1000 -lr 0.5
+python main.py -c ../data/kdd_datasets/proteins -l ../data/kdd_datasets/proteins.Labels -b 512 -d 512 --wlk_h 3 -e 1000 -lr 0.5
+python main.py -c ../data/kdd_datasets/nci1 -l ../data/kdd_datasets/nci1.Labels -b 1024 -d 512 --wlk_h 3 -e 1000 -lr 0.5
+python main.py -c ../data/kdd_datasets/nci109 -l ../data/kdd_datasets/nci109.Labels -b 1204 -d 512 --wlk_h 3 -e 1000 -lr 0.5
