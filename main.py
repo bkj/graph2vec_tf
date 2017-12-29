@@ -27,15 +27,15 @@ from graph2vec.skipgram import Skipgram
 def parse_args():
     parser = argparse.ArgumentParser("graph2vec")
     
-    parser.add_argument("--corpus", default = "./data/kdd_datasets/ptc")
+    parser.add_argument("--indir", default = "./data/kdd_datasets/ptc")
     parser.add_argument("--label-path", default='./data/kdd_datasets/ptc.Labels')
     parser.add_argument("--label-field", default='Label')
     
     parser.add_argument("--batch-size", default=128, type=int)
     parser.add_argument("--epochs", default=1000, type=int)
-    parser.add_argument("--embedding-size", default=1024, type=int)
+    parser.add_argument("--embedding-dim", default=1024, type=int)
     parser.add_argument("--num-negsample", default=10, type=int)
-    parser.add_argument("--learning-rate", default=0.3, type=float)
+    parser.add_argument("--lr", default=0.3, type=float)
     parser.add_argument("--wl-height", default=3, type=int)
     
     parser.add_argument('--seed', type=int, default=123)
@@ -56,40 +56,45 @@ def get_class_labels(graph_files, label_path):
 
 args = parse_args()
 
+np.random.seed(args.seed)
+
 # >>
 args.indir = './data/kdd_datasets/mutag'
 args.label_path = './data/kdd_datasets/mutag.Labels'
-args.embedding_size = 512
-args.learning_rate = 0.5
+args.embedding_dim = 512
+args.lr = 0.5
 # <<
 
+# --
+# IO
+
 graph_files = get_files(dirname=args.indir, extn='.gexf', max_files=0)
-
-wlk_relabel_and_dump_memory_version(graph_files, max_h=args.wl_height, node_label_attr_name=args.label_field)
-
-wl_extn = 'g2v' + str(args.wl_height)
-wlk_files = get_files(dirname=args.indir, extn=wl_extn, max_files=0)
+# wlk_relabel_and_dump_memory_version(graph_files, max_h=args.wl_height, node_label_attr_name=args.label_field)
+wlk_files = get_files(dirname=args.indir, extn='g2v' + str(args.wl_height))
 
 # --
 # Train skipgram model
 
-corpus = Corpus(args.indir, extn=wl_extn)
+corpus = Corpus(args.indir, wlk_files)
+
+skipgram_model = Skipgram(
+    corpus=corpus,
+    lr=args.lr,
+    embedding_dim=args.embedding_dim,
+    num_negsample=args.num_negsample,
+    seed=args.seed,
+)
+
+X = skipgram_model.train(
+    corpus=corpus,
+    num_epochs=args.epochs,
+    batch_size=args.batch_size,
+)
 
 # --
 # Train classifier
 
-X = Skipgram(
-    corpus=corpus,
-    
-    learning_rate=args.learning_rate,
-    embedding_size=args.embedding_size,
-    num_negsample=args.num_negsample,
-    num_epochs=args.epochs,
-    batch_size=args.batch_size
-).train()
-
 y = get_class_labels(wlk_files, args.label_path)
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=args.seed)
 
 classifier = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=3)

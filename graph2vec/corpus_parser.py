@@ -1,23 +1,21 @@
 import numpy as np
 from collections import Counter
-from random import shuffle
 from utils import get_files
 
 class Corpus(object):
-    def __init__(self, indir, extn='WL2'):
+    def __init__(self, indir, graph_fname_list):
         self.subgraph_index = 0
         self.graph_index = 0
         self.epoch_flag = 0
         self.graph_ids_for_batch_traversal = []
-        self.extn = extn
         
         # scan_and_load_corpus
-        self.graph_fname_list = get_files(self.indir, extn=self.extn)
+        self.graph_fname_list = graph_fname_list
         self._graph_name_to_id_map = {g: i for i, g in enumerate(self.graph_fname_list)}  # input layer of the skipgram network
         self._id_to_graph_name_map = {i: g for g, i in self._graph_name_to_id_map.iteritems()}
         subgraph_to_id_map = self._scan_corpus()
         self.graph_ids_for_batch_traversal = range(self.num_graphs)
-        shuffle(self.graph_ids_for_batch_traversal)
+        np.random.shuffle(self.graph_ids_for_batch_traversal)
     
     def _scan_corpus(self):
         
@@ -59,6 +57,7 @@ class Corpus(object):
                 self.graph_index = 0
                 np.random.shuffle(self.graph_ids_for_batch_traversal)
                 self.epoch_flag = True
+            
             graph_name = self.graph_fname_list[self.graph_ids_for_batch_traversal[self.graph_index]]
             graph_contents = open(graph_name).readlines()
             
@@ -81,9 +80,9 @@ class Corpus(object):
                     
                 graph_name = self.graph_fname_list[self.graph_ids_for_batch_traversal[self.graph_index]]
                 graph_contents = open(graph_name).readlines()
-                
+        
         target_context_pairs = zip(target_graph_ids, context_subgraph_ids)
-        shuffle(target_context_pairs)
+        np.random.shuffle(target_context_pairs)
         target_graph_ids, context_subgraph_ids = zip(*target_context_pairs)
         
         target_graph_ids = np.array(target_graph_ids, dtype=np.int32)
@@ -91,4 +90,4 @@ class Corpus(object):
         
         contextword_outputs = np.reshape(context_subgraph_ids, [len(context_subgraph_ids), 1])
         
-        return target_graph_ids,contextword_outputs
+        return target_graph_ids, contextword_outputs
