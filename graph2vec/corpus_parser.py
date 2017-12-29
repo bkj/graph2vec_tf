@@ -1,6 +1,5 @@
 import numpy as np
 from collections import Counter
-from utils import get_files
 
 class Corpus(object):
     def __init__(self, graph_fname_list):

@@ -76,38 +76,36 @@ if __name__ == "__main__":
     for graph_file, graph in zip(graph_files, graphs):
         dump_sg2vec_str(graph_file, args.wl_height, graph)
     
-    # wlk_files = sorted(glob(os.path.join(args.indir, '*.g2v' + str(args.wl_height))))
+    wlk_files = sorted(glob(os.path.join(args.indir, '*.g2v' + str(args.wl_height))))
     
-    # # --
-    # # Featurize graphs
+    # --
+    # Featurize graphs
     
-    # corpus = Corpus(wlk_files)
+    corpus = Corpus(wlk_files)
     
-    # skipgram_model = Skipgram(
-    #     corpus=corpus,
-    #     lr=args.lr,
-    #     embedding_dim=args.embedding_dim,
-    #     num_negsample=args.num_negsample,
-    #     seed=args.seed,
-    # )
+    skipgram_model = Skipgram(
+        corpus=corpus,
+        lr=args.lr,
+        embedding_dim=args.embedding_dim,
+        num_negsample=args.num_negsample,
+    )
     
-    # X = skipgram_model.train(
-    #     corpus=corpus,
-    #     num_epochs=args.epochs,
-    #     batch_size=args.batch_size,
-    # )
+    X = skipgram_model.train(
+        corpus=corpus,
+        num_epochs=args.epochs,
+        batch_size=args.batch_size,
+    )
+    y = get_class_labels(wlk_files, args.label_path)
     
-    # # --
-    # # Train classifier
+    np.save('.X', X)
+    # X = np.load('.X.npy')
     
-    # y = get_class_labels(wlk_files, args.label_path)
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=args.seed)
+    # --
+    # Train classifier
     
-    # classifier = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=3)
-    # classifier.fit(X_train, y_train)
-    
-    # y_pred = classifier.predict(X_test)
-    
-    # acc = metrics.accuracy_score(y_test, y_pred)
-    # print(metrics.classification_report(y_test, y_pred), file=sys.stderr)
+    for _ in range(10):
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=np.random.randint(10000))
+        svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=0)
+        svc.fit(X_train, y_train)
+        print("acc=%f" % metrics.accuracy_score(y_test, svc.predict(X_test)))
 

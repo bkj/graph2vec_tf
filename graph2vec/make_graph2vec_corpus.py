@@ -81,5 +81,4 @@ def dump_sg2vec_str(fname, wl_height, g):
                 nei_list = ' '.join(nei_list)
                 
                 sentence = center + ' ' + nei_list
-                # print >> fh, sentence
-                print(opfname, sentence)
+                print >> fh, sentence
