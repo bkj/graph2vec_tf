@@ -1,26 +1,25 @@
-from nltk.tokenize import RegexpTokenizer
-import os
 import numpy as np
-import logging
-import operator
-from collections import defaultdict,Counter
+from collections import Counter
 from random import shuffle
-from pprint import pprint
 from utils import get_files
 
-
 class Corpus(object):
-    def __init__(self, corpus_folder=None, extn='WL2', max_files=0):
-        assert corpus_folder != None, "please specify the corpus folder"
-        self.corpus_folder = corpus_folder
+    def __init__(self, indir, extn='WL2'):
         self.subgraph_index = 0
         self.graph_index = 0
         self.epoch_flag = 0
-        self.max_files = max_files
         self.graph_ids_for_batch_traversal = []
         self.extn = extn
+        
+        # scan_and_load_corpus
+        self.graph_fname_list = get_files(self.indir, extn=self.extn)
+        self._graph_name_to_id_map = {g: i for i, g in enumerate(self.graph_fname_list)}  # input layer of the skipgram network
+        self._id_to_graph_name_map = {i: g for g, i in self._graph_name_to_id_map.iteritems()}
+        subgraph_to_id_map = self._scan_corpus()
+        self.graph_ids_for_batch_traversal = range(self.num_graphs)
+        shuffle(self.graph_ids_for_batch_traversal)
     
-    def scan_corpus(self):
+    def _scan_corpus(self):
         
         subgraphs = []
         for fname in self.graph_fname_list:
@@ -46,20 +45,6 @@ class Corpus(object):
             self.subgraph_id_freq_map_as_list.append(self._subgraph_to_freq_map[self._id_to_subgraph_map[i]])
             
         return self._subgraph_to_id_map
-        
-    def scan_and_load_corpus(self):
-        
-        self.graph_fname_list = get_files(self.corpus_folder, extn=self.extn, max_files=self.max_files)
-        self._graph_name_to_id_map = {g: i for i, g in enumerate(self.graph_fname_list)}  # input layer of the skipgram network
-        self._id_to_graph_name_map = {i: g for g, i in self._graph_name_to_id_map.iteritems()}
-        subgraph_to_id_map = self.scan_corpus()
-        
-        logging.info('number of graphs: %d' % self.num_graphs)
-        logging.info('subgraph vocabulary size: %d' % self.num_subgraphs)
-        logging.info('total number of subgraphs to be trained: %d' % self._subgraphcount)
-        
-        self.graph_ids_for_batch_traversal = range(self.num_graphs)
-        shuffle(self.graph_ids_for_batch_traversal)
         
     def generate_batch_from_file(self, batch_size):
         target_graph_ids = []
