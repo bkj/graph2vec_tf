@@ -78,15 +78,18 @@ class Skipgram(object):
     
     def train(self, corpus, num_epochs, batch_size):
         
-        with tf.Session(graph=self.graph, config=tf.ConfigProto(allow_soft_placement=False)) as sess:
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        config.gpu_options.visible_device_list="0"
+        with tf.Session(graph=self.graph, config=config) as sess:
             
             sess.run(tf.global_variables_initializer())
             
             for epoch in range(num_epochs):
                 loss, step = 0, 0
-                for batch_data, subgraph_ids in corpus.iterate(batch_size):
+                for graph_ids, subgraph_ids in corpus.iterate(batch_size):
                     _, loss_val = sess.run([self.optimizer, self.loss], feed_dict={
-                        self.graph_ids: batch_data,
+                        self.graph_ids: graph_ids,
                         self.subgraph_ids: subgraph_ids
                     })
                     

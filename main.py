@@ -50,6 +50,7 @@ if __name__ == "__main__":
     df.columns = ('graph', 'class_label', 'subgraph')
     
     corpus = Corpus(df)
+    graph_labels = corpus.y
     
     # --
     # Train model
@@ -69,21 +70,24 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
     )
     
+    
     np.save('%s.feats' % args.inpath, graph_features)
-    np.save('%s.labs' % args.inpath, corpus.y)
+    np.save('%s.labs' % args.inpath, graph_labels)
+    
+    # graph_features = np.load('%s.feats.npy' % args.inpath)
+    # graph_labels = np.load('%s.labs.npy' % args.inpath)
     
     # --
     # Train classifier (multiple times, to get idea of variance)
     
     accs = []
     for _ in range(args.num_fits):
-        X_train, X_test, y_train, y_test = train_test_split(graph_features, corpus.y, test_size=0.1, random_state=np.random.randint(10000))
+        X_train, X_test, y_train, y_test = train_test_split(graph_features, graph_labels, test_size=0.1, random_state=np.random.randint(10000))
         svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=0)
         svc.fit(X_train, y_train)
-        acc = acc
-        print("acc=%f" % )
+        acc = metrics.accuracy_score(y_test, svc.predict(X_test))
+        print("acc=%f" % acc)
         accs.append(acc)
     
-    print('mean acc=%f' % np.mean(accs))
+    print('acc | mean=%f | std=%f' % (np.mean(accs), np.std(accs)))
 
-    
