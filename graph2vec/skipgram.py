@@ -28,7 +28,6 @@ class Skipgram(object):
             weights = tf.Variable(tf.truncated_normal([corpus.num_subgraphs, embedding_dim], stddev=1.0 / math.sqrt(embedding_dim), seed=np.random.randint(10000)))
             biases = tf.Variable(tf.zeros(corpus.num_subgraphs))
             
-            #negative sampling part
             self.loss = tf.reduce_mean(
               tf.nn.nce_loss(
                 weights=weights,

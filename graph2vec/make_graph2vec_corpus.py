@@ -4,11 +4,15 @@
     make_graph2vec_corpus.py
 """
 
+from __future__ import print_function
+
 import networkx as nx
 
 def get_int_node_label(l):
     return int(l.split('+')[-1])
 
+# --
+# Original
 
 def initial_relabel(g, label_field, label_lookup):
     
@@ -32,13 +36,11 @@ def initial_relabel(g, label_field, label_lookup):
     
     return g
 
-
 def wl_relabel(g, height, label_lookup):
     
     prev_height = height - 1
     for node in g.nodes():
-        prev_height_node_label = get_int_node_label(g.nodes[node]['relabel'][prev_height])
-        node_label = [prev_height_node_label]
+        node_label = [get_int_node_label(g.nodes[node]['relabel'][prev_height])]
         neighbors = list(nx.all_neighbors(g, node))
         neighborhood_label = sorted([get_int_node_label(g.nodes[nei]['relabel'][prev_height]) for nei in neighbors])
         node_neighborhood_label = tuple(node_label + neighborhood_label)
@@ -81,4 +83,57 @@ def dump_sg2vec_str(fname, wl_height, g):
                 nei_list = ' '.join(nei_list)
                 
                 sentence = center + ' ' + nei_list
-                print >> fh, sentence
+                print(sentence, file=fh)
+
+
+# --
+# New
+
+def initial_relabel_2(g, label_field, label_lookup):
+    for node in g.nodes():
+        if label_field not in g.node[node]:
+            g.node[node]['relabel'] = {0: '0+0'}
+        else:
+            label = g.node[node][label_field]
+            
+            if label not in label_lookup:
+                label_lookup[label] = len(label_lookup) + 1
+            
+            g.node[node]['relabel'] = {0: '0+%d' % label_lookup[label]}
+    
+    return g
+
+def wl_relabel_2(g, height, label_lookup):
+    for node in g.nodes():
+        neib_label = tuple(sorted([get_int_node_label(g.nodes[neib]['relabel'][height - 1]) for neib in nx.all_neighbors(g, node)]))
+        node_neib_label = (get_int_node_label(g.nodes[node]['relabel'][height - 1]), neib_label)
+        
+        if node_neib_label not in label_lookup:
+            label_lookup[node_neib_label] = len(label_lookup) + 1
+        
+        g.node[node]['relabel'][height] = '%d+%d' % (height, label_lookup[node_neib_label])
+    
+    return g
+
+
+
+def dump_sg2vec_str_2(fname, wl_height, g):
+    
+    opfname = fname + '.g2v' + str(wl_height) + '.v2'
+    
+    with open(opfname,'w') as fh:
+        for n, d in g.nodes(data=True):
+            for height in range(0, wl_height + 1):
+                
+                nei_list = list(set([g.node[nei]['relabel'][height] for nei in nx.all_neighbors(g, n)]))
+                
+                if height != 0:
+                    neis_labels_prev_deg = [g.node[nei]['relabel'][height - 1] for nei in nx.all_neighbors(g, n)]
+                    nei_list += sorted(list(set(neis_labels_prev_deg)))
+                
+                if height != wl_height:
+                    neis_labels_next_deg = [g.node[nei]['relabel'][height + 1] for nei in nx.all_neighbors(g, n)]
+                    nei_list += sorted(list(set(neis_labels_next_deg)))
+                
+                sentence = d['relabel'][height] + ' ' + ' '.join(nei_list)
+                print(sentence, file=fh)
