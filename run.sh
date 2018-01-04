@@ -5,23 +5,28 @@
 # --
 # Run on example datasets
 
-python graph2vec/prep.py \
+python ./prep.py \
     --indir ./data/kdd_datasets/mutag \
     --label-path ./data/kdd_datasets/mutag.Labels > mutag.wlk
 
-python main.py \
+python ./main.py \
     --inpath mutag.wlk \
     --batch-size 256 \
-    --seed 456 \
+    --seed 789 \
     --num-fits 10
 
 # --
 # More examples -- deprecated API
 
-# python main.py \
-#     --indir ./data/kdd_datasets/ptc \
-#     --label-path ./data/kdd_datasets/ptc.Labels \
-#     --batch-size 256
+python ./prep.py \
+    --indir ./data/kdd_datasets/ptc \
+    --label-path ./data/kdd_datasets/ptc.Labels > ptc.wlk
+
+python ./main.py \
+    --inpath mutag.wlk \
+    --batch-size 256 \
+    --seed 789 \
+    --num-fits 10
 
 # python main.py \
 #     --indir ./data/kdd_datasets/proteins \

@@ -51,26 +51,27 @@ if __name__ == "__main__":
     
     corpus = Corpus(df)
     
-    # # --
-    # # Train model
+    # --
+    # Train model
     
-    # skipgram_model = Skipgram(
-    #     num_graphs=len(corpus.graph_lookup),
-    #     num_subgraphs=len(corpus.subgraph_lookup),
-    #     subgraph_frequencies=corpus.subgraph_frequencies,
-    #     lr=args.lr,
-    #     embedding_dim=args.embedding_dim,
-    #     num_negsample=args.num_negsample,
-    # )
+    skipgram_model = Skipgram(
+        num_graphs=len(corpus.graph_lookup),
+        num_subgraphs=len(corpus.subgraph_lookup),
+        subgraph_frequencies=corpus.subgraph_frequencies,
+        lr=args.lr,
+        embedding_dim=args.embedding_dim,
+        num_negsample=args.num_negsample,
+    )
     
-    # graph_features = skipgram_model.train(
-    #     corpus=corpus,
-    #     num_epochs=args.epochs,
-    #     batch_size=args.batch_size,
-    # )
+    graph_features = skipgram_model.train(
+        corpus=corpus,
+        num_epochs=args.epochs,
+        batch_size=args.batch_size,
+    )
     
-    # np.save('graph_features', graph_features)
-    graph_features = np.load('graph_features.npy')
+    np.save('%s.feats' % args.inpath, graph_features)
+    np.save('%s.labs' % args.inpath, corpus.y)
+    
     # --
     # Train classifier (multiple times, to get idea of variance)
     
