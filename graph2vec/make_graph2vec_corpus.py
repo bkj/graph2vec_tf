@@ -80,5 +80,5 @@ def dump_sg2vec_str(fname, wl_height, g):
                 nei_list = neis_labels_same_deg + neis_labels_prev_deg + neis_labels_next_deg
                 nei_list = ' '.join(nei_list)
                 
-                sentence = center + ' ' + nei_list
+                sentence = center#  + ' ' + nei_list
                 print >> fh, sentence
