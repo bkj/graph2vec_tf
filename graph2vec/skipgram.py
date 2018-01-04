@@ -63,7 +63,7 @@ class Skipgram(object):
             
             for i in range(num_epochs):
                 loss, step = 0, 0
-                while corpus.epoch_flag == False:
+                while not corpus.epoch_flag:
                     batch_data, batch_labels = corpus.generate_batch_from_file(batch_size)
                     
                     _, loss_val = sess.run([self.optimizer, self.loss], feed_dict={

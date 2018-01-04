@@ -58,12 +58,10 @@ class Corpus(object):
             graph_contents = open(graph_name).readlines()
             
         while len(batch_labels) < batch_size:
-            line_id = self.subgraph_index
-            context_subgraph = graph_contents[line_id].split()[0]
-            target_graph = graph_name
+            batch_data.append(self._graph_name_to_id_map[graph_name])
             
-            batch_data.append(self._graph_name_to_id_map[target_graph])
-            batch_labels.append(self._subgraph_to_id_map[context_subgraph])
+            label = graph_contents[self.subgraph_index].split()[0]
+            batch_labels.append(self._subgraph_to_id_map[label])
             
             self.subgraph_index += 1
             while self.subgraph_index == len(graph_contents):
