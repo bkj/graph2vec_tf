@@ -90,7 +90,7 @@ if __name__ == "__main__":
     )
     y = get_class_labels(wlk_paths, args.label_path)
     
-    # np.save('.X', X)
+    np.save('.X', X)
     # X = np.load('.X.npy')
     
     # --
