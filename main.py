@@ -74,31 +74,31 @@ if __name__ == "__main__":
     # --
     # Featurize graphs
     
-    corpus = Corpus(wlk_paths)
+    # corpus = Corpus(wlk_paths)
     
-    skipgram_model = Skipgram(
-        corpus=corpus,
-        lr=args.lr,
-        embedding_dim=args.embedding_dim,
-        num_negsample=args.num_negsample,
-    )
+    # skipgram_model = Skipgram(
+    #     corpus=corpus,
+    #     lr=args.lr,
+    #     embedding_dim=args.embedding_dim,
+    #     num_negsample=args.num_negsample,
+    # )
     
-    X = skipgram_model.train(
-        corpus=corpus,
-        num_epochs=args.epochs,
-        batch_size=args.batch_size,
-    )
-    y = get_class_labels(wlk_paths, args.label_path)
+    # X = skipgram_model.train(
+    #     corpus=corpus,
+    #     num_epochs=args.epochs,
+    #     batch_size=args.batch_size,
+    # )
+    # y = get_class_labels(wlk_paths, args.label_path)
     
-    np.save('.X', X)
-    # X = np.load('.X.npy')
+    # np.save('.X', X)
+    # # X = np.load('.X.npy')
     
-    # --
-    # Train classifier
+    # # --
+    # # Train classifier
     
-    for _ in range(args.num_fits):
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=np.random.randint(10000))
-        svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=0)
-        svc.fit(X_train, y_train)
-        print("acc=%f" % metrics.accuracy_score(y_test, svc.predict(X_test)))
+    # for _ in range(args.num_fits):
+    #     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=np.random.randint(10000))
+    #     svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=0)
+    #     svc.fit(X_train, y_train)
+    #     print("acc=%f" % metrics.accuracy_score(y_test, svc.predict(X_test)))
 
