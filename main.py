@@ -75,9 +75,15 @@ if __name__ == "__main__":
     # --
     # Train classifier (multiple times, to get idea of variance)
     
+    accs = []
     for _ in range(args.num_fits):
         X_train, X_test, y_train, y_test = train_test_split(graph_features, corpus.y, test_size=0.1, random_state=np.random.randint(10000))
         svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=0)
         svc.fit(X_train, y_train)
-        print("acc=%f" % metrics.accuracy_score(y_test, svc.predict(X_test)))
+        acc = acc
+        print("acc=%f" % )
+        accs.append(acc)
+    
+    print('mean acc=%f' % np.mean(accs))
 
+    
