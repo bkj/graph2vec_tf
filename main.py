@@ -17,7 +17,7 @@ from sklearn import metrics
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split, GridSearchCV
 
-from graph2vec.make_graph2vec_corpus import *
+from graph2vec.wl_kernel import wl_kernel
 from graph2vec.corpus_parser import Corpus
 from graph2vec.skipgram import Skipgram
 
@@ -66,23 +66,15 @@ if __name__ == "__main__":
     
     graph_files = sorted(glob(os.path.join(args.indir, '*.gexf')))
     
-    label_lookup = {}
-    graphs = [nx.read_gexf(graph_file) for graph_file in graph_files]
-    graphs = [initial_relabel(g, args.label_field, label_lookup) for g in graphs]
+    # --
+    # WL Kernel
     
-    for height in range(1, args.wl_height + 1):
-        label_lookup = {}
-        graphs = [wl_relabel(graph, height, label_lookup) for graph in graphs]
-    
-    for graph_file, graph in zip(graph_files, graphs):
-        dump_sg2vec_str(graph_file, args.wl_height, graph)
-    
-    wlk_files = sorted(glob(os.path.join(args.indir, '*.g2v' + str(args.wl_height))))
+    wlk_paths = [wl_kernel(graph_file, label_field=args.label_field, wl_height=args.wl_height) for graph_file in graph_files]
     
     # --
     # Featurize graphs
     
-    corpus = Corpus(wlk_files)
+    corpus = Corpus(wlk_paths)
     
     skipgram_model = Skipgram(
         corpus=corpus,
@@ -96,7 +88,7 @@ if __name__ == "__main__":
         num_epochs=args.epochs,
         batch_size=args.batch_size,
     )
-    y = get_class_labels(wlk_files, args.label_path)
+    y = get_class_labels(wlk_paths, args.label_path)
     
     # np.save('.X', X)
     # X = np.load('.X.npy')
