@@ -16,6 +16,7 @@ class Corpus(object):
     def __init__(self, graphs):
         # Graph names to unique IDs
         self.graph_lookup = {g['graph_file']:i for i, g in enumerate(graphs)}
+        
         self.graph_ids = np.array([self.graph_lookup[g['graph_file']] for g in graphs])
         self.graph_ids = np.repeat(self.graph_ids, [len(g['subgraphs']) for g in graphs])
         
@@ -24,10 +25,7 @@ class Corpus(object):
         subgraph2freq = Counter(np.concatenate([subgraphs, ['UNK']]))
         self.subgraph_frequencies = subgraph2freq.values()
         self.subgraph_lookup = {sg:i for i, sg in enumerate(subgraph2freq.keys())}
-        self.subgraph_ids = np.array([self.subgraph_lookup[s] for s in subgraphs]).reshape(-1, 1)
-        
-        np.save('a', self.graph_ids)
-        np.save('b', self.subgraph_ids)
+        self.subgraph_ids = np.array([self.subgraph_lookup[sg] for sg in subgraphs]).reshape(-1, 1)
         
     def iterate(self, batch_size):
         idx = np.random.permutation(self.graph_ids.shape[0])
