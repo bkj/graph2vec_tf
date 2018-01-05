@@ -23,9 +23,9 @@ python ./prep.py \
     --label-path ./data/kdd_datasets/ptc.Labels > ptc.wlk
 
 python ./main.py \
-    --inpath mutag.wlk \
+    --inpath ptc.wlk \
     --batch-size 256 \
-    --seed 789 \
+    --seed 123 \
     --num-fits 10
 
 # python main.py \
