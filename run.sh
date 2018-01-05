@@ -3,42 +3,16 @@
 # run.sh
 
 # --
-# Run on example datasets
+# Run on a small example dataset
 
-python ./prep.py \
-    --indir ./data/kdd_datasets/mutag \
-    --label-path ./data/kdd_datasets/mutag.Labels > mutag.wlk
+mkdir -p _results/mutag
+
+find ./data/kdd_datasets/mutag/*gexf -type f |\
+    python ./prep.py --label-path ./data/kdd_datasets/mutag.Labels > _results/mutag/wlk
 
 python ./main.py \
-    --inpath mutag.wlk \
+    --inpath _results/mutag/wlk \
+    --outdir _results/mutag \
     --batch-size 256 \
     --seed 789 \
     --num-fits 10
-
-# --
-# More examples -- deprecated API
-
-python ./prep.py \
-    --indir ./data/kdd_datasets/ptc \
-    --label-path ./data/kdd_datasets/ptc.Labels > ptc.wlk
-
-python ./main.py \
-    --inpath ptc.wlk \
-    --batch-size 256 \
-    --seed 123 \
-    --num-fits 10
-
-# python main.py \
-#     --indir ./data/kdd_datasets/proteins \
-#     --label-path ./data/kdd_datasets/proteins.Labels \
-#     --batch-size 512
-
-# python main.py \
-#     --indir ./data/kdd_datasets/nci1 \
-#     --label-path ./data/kdd_datasets/nci1.Labels \
-#     --batch-size 1024
-
-# python main.py \
-#     --indir ./data/kdd_datasets/nci109 \
-#     --label-path ./data/kdd_datasets/nci109.Labels \
-#     --batch-size 1024

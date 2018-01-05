@@ -7,8 +7,10 @@
 from __future__ import print_function
 
 import os
+import sys
 import pickle
 import argparse
+import pandas as pd
 from glob import glob
 import networkx as nx
 from hashlib import md5
@@ -18,26 +20,14 @@ from hashlib import md5
 
 def parse_args():
     parser = argparse.ArgumentParser("graph2vec")
-    
-    parser.add_argument("--indir", default = "./data/kdd_datasets/ptc")
-    parser.add_argument("--label-path", default='./data/kdd_datasets/ptc.Labels')
-    parser.add_argument("--label-field", default='Label')
-    parser.add_argument("--wl-height", default=3, type=int)
-    
-    args = parser.parse_args()
-    
-    assert os.path.exists(args.indir), "%s does not exist" % args.indir
-    
-    return args
+    parser.add_argument("--graph-format", type=str, default='gexf')
+    parser.add_argument("--label-path", type=str, default='./data/kdd_datasets/ptc.Labels')
+    parser.add_argument("--label-field", type=str, default='Label')
+    parser.add_argument("--wl-height", type=int, default=3)
+    return parser.parse_args()
 
 # --
 # Helpers
-
-def get_class_labels(graph_files, label_path):
-    graph_to_class_label_map = {l.split()[0].split('.')[0] : int(l.split()[1].strip()) for l in open(label_path)}
-    class_labels = [graph_to_class_label_map[os.path.basename(g).split('.')[0]] for g in graph_files]
-    return dict(zip(graph_files, class_labels))
-
 
 def safe_hash(x):
     return md5(pickle.dumps(x)).hexdigest()
@@ -49,14 +39,18 @@ if __name__ == "__main__":
     
     args = parse_args()
     
-    graph_files = sorted(glob(os.path.join(args.indir, '*.gexf')))
-    class_labels = get_class_labels(graph_files, args.label_path)
+    class_labels = pd.read_csv(args.label_path, sep=' ', header=None)
+    class_labels = dict(zip(class_labels[0], class_labels[1]))
     
-    for graph_file in graph_files:
-        class_label = class_labels[graph_file]
+    for graph_file in sys.stdin:
+        graph_file = graph_file.strip()
+        class_label = class_labels[os.path.basename(graph_file)]
         
         # Load graph
-        g = nx.read_gexf(graph_file)
+        if args.graph_format == 'gexf':
+            g = nx.read_gexf(graph_file)
+        else:
+            raise Exception('prep.py: unknown format')
         
         # Init WL kernel
         for node in g.nodes():

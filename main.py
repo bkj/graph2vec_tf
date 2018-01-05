@@ -23,7 +23,8 @@ from graph2vec import Corpus, Skipgram
 def parse_args():
     parser = argparse.ArgumentParser("graph2vec")
     
-    parser.add_argument("--inpath", default="./mutag.wlk")
+    parser.add_argument("--inpath", default="./_results/mutag/wlk")
+    parser.add_argument("--outdir", default="./_results/mutag/")
     
     parser.add_argument("--embedding-dim", default=512, type=int)
     parser.add_argument("--epochs", default=1000, type=int)
@@ -70,12 +71,8 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
     )
     
-    
-    np.save('%s.feats' % args.inpath, graph_features)
-    np.save('%s.labs' % args.inpath, graph_labels)
-    
-    # graph_features = np.load('%s.feats.npy' % args.inpath)
-    # graph_labels = np.load('%s.labs.npy' % args.inpath)
+    np.save(os.path.join(args.outpath, 'feats'), graph_features)
+    np.save(os.path.join(args.outpath, 'labs'), graph_labels)
     
     # --
     # Train classifier (multiple times, to get idea of variance)
