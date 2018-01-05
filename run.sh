@@ -7,8 +7,8 @@
 
 mkdir -p _results/mutag
 
-find ./data/kdd_datasets/mutag/*gexf -type f |\
-    python ./prep.py --label-path ./data/kdd_datasets/mutag.Labels > _results/mutag/wlk
+find ./_data/mutag/graphs -type f |\
+    python ./prep.py --label-path ./_data/mutag/labels > _results/mutag/wlk
 
 python ./main.py \
     --inpath _results/mutag/wlk \

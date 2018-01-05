@@ -21,7 +21,7 @@ from hashlib import md5
 def parse_args():
     parser = argparse.ArgumentParser("graph2vec")
     parser.add_argument("--graph-format", type=str, default='gexf')
-    parser.add_argument("--label-path", type=str, default='./data/kdd_datasets/ptc.Labels')
+    parser.add_argument("--label-path", type=str, default='./_data/mutag/labels')
     parser.add_argument("--label-field", type=str, default='Label')
     parser.add_argument("--wl-height", type=int, default=3)
     return parser.parse_args()
