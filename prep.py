@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import os
 import sys
+import json
 import pickle
 import argparse
 import pandas as pd
@@ -65,7 +66,14 @@ if __name__ == "__main__":
                 g.node[node]['relabel'].update({height : safe_hash(label)})
         
         # Write to file
+        wlk = []
         for n, d in g.nodes(data=True):
             for height, relabel in d['relabel'].items():
-                print('%s\t%d\t%d+%s' % (graph_file, class_label, height, relabel))
+                wlk.append('%d+%s' % (height, relabel))
+        
+        print(json.dumps({
+            "graph_file" : graph_file,
+            "class_label" : class_label,
+            "subgraphs" : wlk,
+        }))
 
