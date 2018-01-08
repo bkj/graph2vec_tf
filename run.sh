@@ -30,8 +30,3 @@ python ./main.py \
     --batch-size 256 \
     --seed 789 \
     --num-fits 10
-
-
-mkdir -p _results/malware/package
-find ./_data/malware/package/ -type f |\
-    python ./prep.py --label-path ./_data/malware/labels --graph-format edgelist > _results/malware/package/wlk.jl
