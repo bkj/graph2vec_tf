@@ -50,13 +50,16 @@ if __name__ == "__main__":
         # Load graph
         if args.graph_format == 'gexf':
             g = nx.read_gexf(graph_file)
+            for node in g.nodes():
+                label = g.node[node].get(args.label_field, 0)
+                g.node[node]['relabel'] = {0: safe_hash(label)}
+        
+        elif args.graph_format == 'edgelist':
+            g = nx.read_edgelist(graph_file, delimiter='\t', data=(('weight',float),))
+            for node in g.nodes:
+                g.node[node]['relabel'] = {0: safe_hash(node)}
         else:
             raise Exception('prep.py: unknown format')
-        
-        # Init WL kernel
-        for node in g.nodes():
-            label = g.node[node].get(args.label_field, 0)
-            g.node[node]['relabel'] = {0: safe_hash(label)}
         
         # Apply WL kernel at multiple heights
         for height in range(1, args.wl_height + 1):

@@ -1,4 +1,5 @@
 _results/*
+_data/malware
 *npy
 *.wlk
 *pyc

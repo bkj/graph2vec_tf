@@ -76,7 +76,7 @@ class Skipgram(object):
             self.optimizer = tf.train.GradientDescentOptimizer(lr).minimize(self.loss, global_step=global_step)
             self.ngraph_embeddings = graph_embeddings / tf.sqrt(tf.reduce_mean(tf.square(graph_embeddings), 1, keep_dims=True))
     
-    def train(self, corpus, num_epochs, batch_size):
+    def train(self, corpus, num_epochs, batch_size, save_interval=25):
         
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
@@ -97,5 +97,9 @@ class Skipgram(object):
                     step += 1
                 
                 print('Skipgram: epoch: %d | avg_loss: %f' % (epoch, loss / step), file=sys.stderr)
+                
+                if not epoch % save_interval:
+                    print('saving .embeddings.npy', file=sys.stderr)
+                    np.save('.embeddings', self.ngraph_embeddings.eval())
             
             return self.ngraph_embeddings.eval()
