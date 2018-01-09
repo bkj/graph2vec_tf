@@ -48,6 +48,7 @@ if __name__ == "__main__":
     # --
     # IO
     
+    print("main.py: load graphs", file=sys.stderr)
     graphs = map(json.loads, open(args.inpath))
     corpus = Corpus(graphs)
     graph_labels = np.array([g['class_label'] for g in graphs])
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     # --
     # Train model
     
+    print("main.py: init skipgram", file=sys.stderr)
     skipgram_model = Skipgram(
         num_graphs=len(corpus.graph_lookup),
         num_subgraphs=len(corpus.subgraph_lookup),
@@ -65,6 +67,7 @@ if __name__ == "__main__":
         num_negsample=args.num_negsample,
     )
     
+    print("main.py: train skipgram", file=sys.stderr)
     ngraph_embeddings = skipgram_model.train(
         corpus=corpus,
         num_epochs=args.epochs,
