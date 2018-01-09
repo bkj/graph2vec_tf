@@ -76,14 +76,18 @@ if __name__ == "__main__":
     # --
     # Train classifier (multiple times, to get an idea of variance)
     
-    accs = []
+    accs, aucs = [], []
     for _ in range(args.num_fits):
         X_train, X_test, y_train, y_test = train_test_split(ngraph_embeddings, graph_labels, test_size=0.1, random_state=np.random.randint(10000))
-        svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=0)
+        svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=1)
         svc.fit(X_train, y_train)
-        acc = metrics.accuracy_score(y_test, svc.predict(X_test))
-        print("acc=%f" % acc)
+        preds = svc.predict(X_test)
+        acc = metrics.accuracy_score(y_test, preds)
+        auc = metrics.roc_auc_score(y_test, preds)
+        print("acc=%f | auc=%f" % (acc, auc))
         accs.append(acc)
+        aucs.append(auc)
     
-    print('acc | mean=%f | std=%f' % (np.mean(accs), np.std(accs)))
+    print('acc | mean=%f | std=%f' % (np.mean(accs), np.std(accs))
+    print('auc | mean=%f | std=%f' % (np.mean(aucs), np.std(aucs))
 
