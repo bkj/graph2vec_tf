@@ -34,6 +34,7 @@ def parse_args():
     parser.add_argument("--num-negsample", default=10, type=int)
     parser.add_argument("--batch-size", default=128, type=int)
     parser.add_argument('--num-fits', type=int, default=1)
+    parser.add_argument('--num-jobs', type=int, default=16)
     
     parser.add_argument('--seed', type=int, default=123)
     
@@ -86,12 +87,23 @@ if __name__ == "__main__":
     
     accs, aucs = [], []
     for _ in range(args.num_fits):
-        X_train, X_test, y_train, y_test = train_test_split(ngraph_embeddings, graph_labels, test_size=0.1, random_state=np.random.randint(10000))
-        svc = GridSearchCV(LinearSVC(), {'C' : 10.0 ** np.arange(-2, 4)}, cv=5, scoring='f1', verbose=1)
+        X_train, X_test, y_train, y_test =\
+            train_test_split(ngraph_embeddings, graph_labels, test_size=0.1, random_state=np.random.randint(10000))
+        
+        svc = GridSearchCV(
+            estimator=LinearSVC(),
+            param_grid={'C' : 10.0 ** np.arange(-2, 4)},
+            cv=5,
+            scoring='f1',
+            verbose=1,
+            n_jobs=args.num_jobs
+        )
         svc.fit(X_train, y_train)
-        preds = svc.predict(X_test)
-        acc = metrics.accuracy_score(y_test, preds)
-        auc = metrics.roc_auc_score(y_test, preds)
+        
+        test_preds = svc.predict(X_test)
+        acc = metrics.accuracy_score(y_test, test_preds)
+        auc = metrics.roc_auc_score(y_test, test_preds)
+        
         print("acc=%f | auc=%f" % (acc, auc))
         accs.append(acc)
         aucs.append(auc)

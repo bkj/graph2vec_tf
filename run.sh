@@ -35,4 +35,5 @@ python ./main.py \
     --outdir _results/malware/class \
     --batch-size 128 \
     --seed 789 \
-    --num-fits 10
+    --num-fits 10 \
+    --epochs 50
