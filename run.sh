@@ -30,3 +30,8 @@ python ./main.py \
     --batch-size 256 \
     --seed 789 \
     --num-fits 10
+
+
+mkdir -p _results/malware/class
+find ./_data/malware/class-2 -type f |\
+    parallel --pipe -N 10 "python ./prep.py --label-path ./_data/malware/labels --graph-format edgelist" > _results/malware/class/wlk.jl

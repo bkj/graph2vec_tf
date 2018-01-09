@@ -88,6 +88,6 @@ if __name__ == "__main__":
         accs.append(acc)
         aucs.append(auc)
     
-    print('acc | mean=%f | std=%f' % (np.mean(accs), np.std(accs))
-    print('auc | mean=%f | std=%f' % (np.mean(aucs), np.std(aucs))
+    print('acc | mean=%f | std=%f' % (np.mean(accs), np.std(accs)))
+    print('auc | mean=%f | std=%f' % (np.mean(aucs), np.std(aucs)))
 
