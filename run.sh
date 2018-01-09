@@ -20,18 +20,19 @@ python ./main.py \
 # --
 # Run on malware dataset
 
-mkdir -p _results/malware/family
-find ./_data/malware/family/ -type f |\
-    python ./prep.py --label-path ./_data/malware/labels --graph-format edgelist > _results/malware/family/wlk.jl
-
-python ./main.py \
-    --inpath _results/malware/family/wlk.jl \
-    --outdir _results/malware/family \
-    --batch-size 256 \
-    --seed 789 \
-    --num-fits 10
-
-
 mkdir -p _results/malware/class
+
+# Compute WL kernels
 find ./_data/malware/class-2 -type f |\
     parallel --pipe -N 10 "python ./prep.py --label-path ./_data/malware/labels --graph-format edgelist" > _results/malware/class/wlk.jl
+
+# Remove infrequent WL kernel tokens
+python ./filter.py --inpath _results/malware/class/wlk.jl --outpath _results/malware/class/wlk.filtered.jl
+
+# Run graph2vec
+python ./main.py \
+    --inpath _results/malware/class/wlk.filtered.jl \
+    --outdir _results/malware/class \
+    --batch-size 128 \
+    --seed 789 \
+    --num-fits 10

@@ -25,8 +25,8 @@ from graph2vec import Corpus, Skipgram
 def parse_args():
     parser = argparse.ArgumentParser("graph2vec")
     
-    parser.add_argument("--inpath", default="./_results/mutag/wlk.jl")
-    parser.add_argument("--outdir", default="./_results/mutag/")
+    parser.add_argument("--inpath", default="./_results/malware/class/wlk.filtered.jl")
+    parser.add_argument("--outdir", default="./_results/malware/class/")
     
     parser.add_argument("--embedding-dim", default=512, type=int)
     parser.add_argument("--epochs", default=1000, type=int)
@@ -52,6 +52,10 @@ if __name__ == "__main__":
     print("main.py: load graphs", file=sys.stderr)
     graphs = map(json.loads, open(args.inpath))
     corpus = Corpus(graphs)
+    
+    # --
+    # Grab labels
+    
     graph_labels = np.array([g['class_label'] for g in graphs])
     np.save(os.path.join(args.outdir, 'labs'), graph_labels)
     
