@@ -22,8 +22,12 @@ python ./main.py \
 
 mkdir -p _results/malware/class
 
+wget --header "Authorization:$TOKEN" https://hiveprogram.com/data/_v1/graph2vec/malware/class.tar.gz
+tar -xzf class.tar.gz && rm class.tar.gz
+mv class _data/malware/class
+
 # Compute WL kernels
-find ./_data/malware/class-2 -type f |\
+find ./_data/malware/class -type f |\
     parallel --pipe -N 10 "python ./prep.py --label-path ./_data/malware/labels --graph-format edgelist" > _results/malware/class/wlk.jl
 
 # Remove infrequent WL kernel tokens
