@@ -2,11 +2,15 @@
 
 """
     filter.py
+    
+    Remove tokens that appear a sufficiently small number of times (default = 1)
 """
 
 from __future__ import print_function
 
 import sys
+import json
+import argparse
 from tqdm import tqdm
 from collections import Counter
 
@@ -20,6 +24,8 @@ def parse_args():
 
 
 if __name__ == "__main__":
+    
+    args = parse_args()
     
     print("filter.py: loading graphs", file=sys.stderr)
     graphs = map(json.loads, open(args.inpath))
